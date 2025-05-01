@@ -28,19 +28,40 @@
         /// </summary>
         private void InitializeComponent()
         {
+            components = new System.ComponentModel.Container();
+            timer1 = new System.Windows.Forms.Timer(components);
+            labelShow = new Label();
             SuspendLayout();
+            // 
+            // timer1
+            // 
+            timer1.Tick += timer1_Tick;
+            // 
+            // labelShow
+            // 
+            labelShow.AutoSize = true;
+            labelShow.Location = new Point(12, 9);
+            labelShow.Name = "labelShow";
+            labelShow.Size = new Size(99, 19);
+            labelShow.TabIndex = 0;
+            labelShow.Text = "尚未新增檔案";
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(9F, 19F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(labelShow);
             Name = "Form1";
             Text = "Form1";
             Load += Form1_Load;
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer timer1;
+        private Label labelShow;
     }
 }

@@ -3,12 +3,26 @@
     /// <summary>
     /// 
     /// </summary>
-    public class AppSettings
+    public class AppSetting
     {
         /// <summary>
         /// 程式名稱
         /// </summary>
-        public string AppName { get; set; }
+        public string? AppName { get; set; }
+
+
+        /// <summary>
+        /// 本機檔案路徑
+        /// </summary>
+        public string? LocalFilePath { get; set; }
+
+        /// <summary>
+        /// 執行頻率(秒)
+        /// </summary>
+        public int FrequencySeconds { get; set; }
+
+
+
 
         /// <summary>
         /// 

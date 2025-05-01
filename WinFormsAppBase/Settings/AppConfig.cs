@@ -6,7 +6,7 @@ namespace WinFormsAppBase.Settings
     public static class AppConfig
     {
         public static IConfiguration Configuration { get; }
-        public static AppSettings Settings { get; private set; }
+        public static AppSetting Setting { get; private set; }
 
         static AppConfig()
         {
@@ -17,8 +17,8 @@ namespace WinFormsAppBase.Settings
                 .Build();
 
             // 使用 Bind 方法將設定綁定到強型別
-            Settings = new AppSettings();
-            Configuration.GetSection("AppSettings").Bind(Settings);
+            Setting = new AppSetting();
+            Configuration.GetSection("AppSettings").Bind(Setting);
         }
     }
 }
