@@ -15,29 +15,25 @@
         /// </summary>
         public int TimerDate { get; set; }
 
-        
-        /// <summary>
-        /// 檢查本機路徑啟用
-        /// </summary>
-        public bool LocalFilePathEnable { get; set; }
-
 
         /// <summary>
-        /// 本機檔案路徑
+        /// 視窗(高)
         /// </summary>
-        public string? LocalFilePath { get; set; }
-
-
+        public int WindowWidth { get; set; }
         /// <summary>
-        /// 檢查網路路徑啟用
+        /// 視窗(寬)
         /// </summary>
-        public bool NetworkDriveFilePathEnable { get; set; }
-
-
+        public int WindowHeight { get; set; }
         /// <summary>
-        /// 網路磁碟上傳路徑
+        /// 視窗是否隱藏
         /// </summary>
-        public string? NetworkDriveFilePath { get; set; }
+        public bool HideWindowEnable { get; set; }
+        /// <summary>
+        /// 視窗是否隱藏到右下方
+        /// </summary>
+        public bool NotifyIconEnable { get; set; }
+
+
 
         /// <summary>
         /// 執行頻率(秒)
@@ -45,52 +41,10 @@
         public int FrequencySeconds { get; set; }
 
 
-        /// <summary>
-        /// EnableSsl
-        /// </summary>
-        public bool EnableSsl { get; set; }
-
-        /// <summary>
-        /// 信箱Host
-        /// </summary>
-        public string? MailHost { get; set; }
 
 
-        /// <summary>
-        /// 信箱Port
-        /// </summary>
-        public int MailPort { get; set; }
 
-        /// <summary>
-        /// 寄件者
-        /// </summary>
-        public string? SendMail { get; set; }
-        /// <summary>
-        /// 寄件密碼
-        /// </summary>
-        public string? SendPassword { get; set; }
 
-      
-
-        /// <summary>
-        /// 收件者清單
-        /// </summary>
-        public string? ReceiveMailList { get; set; }
-
-        /// <summary>
-        /// CC收件者清單
-        /// </summary>
-        public string? ReceiveMailCcList { get; set; }
-
-                
-        /// <summary>
-        /// 主旨
-        /// </summary>
-        public string? MailSubject { get; set; }
-        /// <summary>
-        /// 內容
-        /// </summary>
-        public string? MailBody { get; set; }
 
 
         /// <summary>

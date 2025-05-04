@@ -2,6 +2,7 @@ using System.Net.Mail;
 using System.Net;
 using System.Runtime;
 using System.Windows.Forms;
+using WinFormsAppBase.Settings;
 
 namespace WinFormsAppBase
 {
@@ -11,37 +12,104 @@ namespace WinFormsAppBase
         /// 確認是否重複執行
         /// </summary>
         private bool isChecking = false;
-
+        /// <summary>
+        /// 訊息
+        /// </summary>
         private string message = "";
 
-
+        NotifyIcon notifyIconForm = new NotifyIcon();
+        ContextMenuStrip contextMenuStripForm = new ContextMenuStrip();
 
         public Form1()
         {
             InitializeComponent();
-            this.Text = Settings.AppConfig.Setting.AppName;
+            this.Text = AppConfig.Setting.AppName;
         }
+
+        /// <summary>
+        /// 處理視窗大小改變（Resize）時的行為
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Form1_Resize(object sender, EventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                HideWindow();
+            }
+        }
+
+        /// <summary>
+        /// 視窗相關設定
+        /// </summary>
+        public void AppSettingsForm()
+        {
+            this.Text = AppConfig.Setting.AppName;
+            this.Size = new Size(AppConfig.Setting.WindowWidth, AppConfig.Setting.WindowHeight);
+
+            if (AppConfig.Setting.HideWindowEnable)
+            {
+                this.Resize += Form1_Resize;
+                HideWindow();
+            }
+
+            if (AppConfig.Setting.NotifyIconEnable)
+            {
+                NotifyIconSetting();
+            }
+
+        }
+
+        /// <summary>
+        /// 縮到右下方
+        /// </summary>
+        public void NotifyIconSetting()
+        {
+            notifyIconForm.Icon = SystemIcons.Application; // 你可以用自己的圖示
+            notifyIconForm.Text = AppConfig.Setting.AppName;
+            notifyIconForm.Visible = true;
+            //點兩下開啟視窗
+            notifyIconForm.DoubleClick += (s, ea) => ShowMainForm();
+        }
+
+        /// <summary>
+        /// 視窗隱藏
+        /// </summary>
+        public void HideWindow()
+        {
+            this.Hide();
+            this.ShowInTaskbar = false;
+        }
+
+        private void ShowMainForm()
+        {
+            this.Show();
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            this.BringToFront();
+        }
+
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            //Mail();
-            timer1.Interval = Settings.AppConfig.Setting.TimerDate;
+            AppSettingsForm();
+            timer1.Interval = AppConfig.Setting.TimerDate;
             timer1.Start();
         }
 
         public void Mail(string file) 
         {
             // 建立 SmtpClient 物件
-            SmtpClient smtp = new SmtpClient(Settings.AppConfig.Setting.MailHost, Settings.AppConfig.Setting.MailPort);
-            smtp.Credentials = new NetworkCredential(Settings.AppConfig.Setting.SendMail, Settings.AppConfig.Setting.SendPassword);
-            smtp.EnableSsl = Settings.AppConfig.Setting.EnableSsl;
+            SmtpClient smtp = new SmtpClient(AppConfig.MailSetting.MailHost, AppConfig.MailSetting.MailPort);
+            smtp.Credentials = new NetworkCredential(AppConfig.MailSetting.SendMail, AppConfig.MailSetting.SendPassword);
+            smtp.EnableSsl = AppConfig.MailSetting.SslEnable;
 
             // 建立 MailMessage 物件
             MailMessage mail = new MailMessage();
-            mail.From = new MailAddress( Settings.AppConfig.Setting.SendMail?? ""); // 寄件人
+            mail.From = new MailAddress(AppConfig.MailSetting.SendMail?? ""); // 寄件人
 
             //收件人
-            string[] receiveMailList = Settings.AppConfig.Setting.ReceiveMailList.Split(';');
+            string[] receiveMailList = AppConfig.MailSetting.ReceiveMailList.Split(';');
             foreach (var receiveMail in receiveMailList)
             {
                 if (!string.IsNullOrEmpty(receiveMail))
@@ -51,7 +119,7 @@ namespace WinFormsAppBase
             }
 
             //CC信件
-            string[] receiveMailCcList = Settings.AppConfig.Setting.ReceiveMailCcList.Split(';');
+            string[] receiveMailCcList = AppConfig.MailSetting.ReceiveMailCcList.Split(';');
             foreach (var receiveMailCc in receiveMailCcList)
             {
                 if (!string.IsNullOrEmpty(receiveMailCc))
@@ -60,8 +128,8 @@ namespace WinFormsAppBase
                 }
             }
 
-            mail.Subject = Settings.AppConfig.Setting.MailSubject;
-            mail.Body = Settings.AppConfig.Setting.MailBody;
+            mail.Subject = AppConfig.MailSetting.MailSubject;
+            mail.Body = AppConfig.MailSetting.MailBody;
             mail.Attachments.Add(new Attachment($@"{file}"));
 
             //mail.Attachments.Add(new Attachment($@"D:\\Test\\新文字文件123.txt"));
@@ -84,7 +152,8 @@ namespace WinFormsAppBase
 
         private async void timer1_Tick(object sender, EventArgs e)
         {
-            message = $"檢查是否有新增檔案\n";
+            DateTime dateTime = DateTime.UtcNow.AddHours(8);
+            message = $"檢查是否有新增檔案，檢查時間：{DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd HH:mm:ss")}。\n";
             SetLabelText(message);
 
             //CheckFile();
@@ -108,18 +177,18 @@ namespace WinFormsAppBase
 
             string filePath = "";
 
-            if (Settings.AppConfig.Setting.LocalFilePathEnable) 
+            if (AppConfig.FileSetting.LocalFilePathEnable) 
             {
-                filePath = $@"{Settings.AppConfig.Setting.LocalFilePath}";
+                filePath = $@"{AppConfig.FileSetting.LocalFilePath}";
             }
                 
-            if (Settings.AppConfig.Setting.NetworkDriveFilePathEnable) 
+            if (AppConfig.FileSetting.NetworkDriveFilePathEnable) 
             {
-                filePath = $@"{Settings.AppConfig.Setting.NetworkDriveFilePath}";
+                filePath = $@"{AppConfig.FileSetting.NetworkDriveFilePath}";
             }
             
             var files = Directory.GetFiles(filePath);
-            DateTime fromTime = DateTime.Now.AddSeconds(-(Settings.AppConfig.Setting.FrequencySeconds));
+            DateTime fromTime = DateTime.Now.AddSeconds(-(AppConfig.Setting.FrequencySeconds));
 
             foreach (var file in files)
             {

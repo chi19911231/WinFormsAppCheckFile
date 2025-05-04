@@ -7,6 +7,8 @@ namespace WinFormsAppBase.Settings
     {
         public static IConfiguration Configuration { get; }
         public static AppSetting Setting { get; private set; }
+        public static AppMailSetting MailSetting { get; private set; }
+        public static AppFileSetting FileSetting { get; private set; }
 
         static AppConfig()
         {
@@ -18,7 +20,12 @@ namespace WinFormsAppBase.Settings
 
             // 使用 Bind 方法將設定綁定到強型別
             Setting = new AppSetting();
-            Configuration.GetSection("AppSettings").Bind(Setting);
+            MailSetting = new AppMailSetting();
+            FileSetting = new AppFileSetting();
+            Configuration.GetSection("AppSetting").Bind(Setting);
+            Configuration.GetSection("AppMailSetting").Bind(MailSetting);
+            Configuration.GetSection("AppFileSetting").Bind(FileSetting);
+
         }
     }
 }
