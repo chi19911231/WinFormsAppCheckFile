@@ -44,7 +44,7 @@
             labelShow.Name = "labelShow";
             labelShow.Size = new Size(99, 19);
             labelShow.TabIndex = 0;
-            labelShow.Text = "尚未新增檔案";
+            labelShow.Text = "啟動";
             // 
             // Form1
             // 
