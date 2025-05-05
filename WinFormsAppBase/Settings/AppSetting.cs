@@ -33,20 +33,6 @@
         /// </summary>
         public bool NotifyIconEnable { get; set; }
 
-
-
-        /// <summary>
-        /// 執行頻率(秒)
-        /// </summary>
-        public int FrequencySeconds { get; set; }
-
-
-
-
-
-
-
-
         /// <summary>
         /// 
         /// </summary>

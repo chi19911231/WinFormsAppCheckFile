@@ -133,8 +133,6 @@ namespace WinFormsAppBase
             mail.Attachments.Add(new Attachment($@"{file}"));
 
             //mail.Attachments.Add(new Attachment($@"D:\\Test\\新文字文件123.txt"));
-            //mail.Attachments.Add(new Attachment($@"D:\\Test\\新文字文件456.txt"));
-            //mail.Attachments.Add(new Attachment($@"D:\\Test\\新文字文件789.txt"));
 
             try
             {
@@ -144,7 +142,7 @@ namespace WinFormsAppBase
             }
             catch (Exception ex)
             {              
-                SetLabelText(ex.Message);
+                SetLabelText($"例外原因:{ex.Message}");
             }
 
         }
@@ -174,9 +172,7 @@ namespace WinFormsAppBase
         /// </summary>
         public void CheckFile() 
         {
-
             string filePath = "";
-
             if (AppConfig.FileSetting.LocalFilePathEnable) 
             {
                 filePath = $@"{AppConfig.FileSetting.LocalFilePath}";
@@ -186,20 +182,24 @@ namespace WinFormsAppBase
             {
                 filePath = $@"{AppConfig.FileSetting.NetworkDriveFilePath}";
             }
-            
-            var files = Directory.GetFiles(filePath);
-            DateTime fromTime = DateTime.Now.AddSeconds(-(AppConfig.Setting.FrequencySeconds));
 
-            foreach (var file in files)
-            {
-                DateTime creationTime = File.GetCreationTime(file);
-                if (creationTime >= fromTime)
+            bool existFile =  Directory.Exists(filePath);
+            if (existFile) 
+            {             
+                string[] files = Directory.GetFiles(filePath);
+                DateTime fromTime = DateTime.Now.AddSeconds(-(AppConfig.FileSetting.FrequencySeconds));
+
+                foreach (var file in files)
                 {
-                    message += $"新增檔案：{file} （建立時間：{creationTime}）\n";                       
-                    SetLabelText(message);
-                    Mail(file);
+                    DateTime creationTime = File.GetCreationTime(file);
+                    if (creationTime >= fromTime)
+                    {
+                        message += $"新增檔案：{file} （建立時間：{creationTime}）\n";                       
+                        SetLabelText(message);
+                        Mail(file);
+                    }
                 }
-            }
+            }         
 
         }
 

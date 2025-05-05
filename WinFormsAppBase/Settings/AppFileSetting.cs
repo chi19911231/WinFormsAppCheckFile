@@ -8,6 +8,13 @@ namespace WinFormsAppBase.Settings
 {
     public  class AppFileSetting
     {
+
+
+        /// <summary>
+        /// 執行頻率(秒)
+        /// </summary>
+        public int FrequencySeconds { get; set; }
+
         /// <summary>
         /// 檢查本機路徑啟用
         /// </summary>
