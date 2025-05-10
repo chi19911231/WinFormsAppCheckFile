@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrayNotify;
 
 namespace WinFormsAppBase.Settings
 {
     public  class AppFileSetting
     {
-
+        
 
         /// <summary>
         /// 執行頻率(秒)

@@ -12,10 +12,16 @@ namespace WinFormsAppBase
         /// 確認是否重複執行
         /// </summary>
         private bool isChecking = false;
+
         /// <summary>
         /// 訊息
         /// </summary>
         private string message = "";
+
+        /// <summary>
+        /// 重試
+        /// </summary>
+        private int retry;
 
         NotifyIcon notifyIconForm = new NotifyIcon();
         ContextMenuStrip contextMenuStripForm = new ContextMenuStrip();
@@ -93,8 +99,20 @@ namespace WinFormsAppBase
         private void Form1_Load(object sender, EventArgs e)
         {
             AppSettingsForm();
-            timer1.Interval = AppConfig.Setting.TimerDate;
-            timer1.Start();
+
+            if (AppConfig.Setting.BackgroundExecutionEnable) 
+            {
+                timer1.Interval = AppConfig.Setting.TimerDate;
+                timer1.Start();
+            }
+            else
+            {
+
+                CheckFile();
+                //關閉程式
+                Application.Exit();
+            }
+         
         }
 
         public void Mail(string file) 
@@ -154,24 +172,38 @@ namespace WinFormsAppBase
             message = $"檢查是否有新增檔案，檢查時間：{DateTime.UtcNow.AddHours(8).ToString("yyyy-MM-dd HH:mm:ss")}。\n";
             SetLabelText(message);
 
-            //CheckFile();
-
             //避免重複執行
-            if (isChecking) { return; }
+            if (isChecking) { return; };
             isChecking = true;
-            await Task.Run(() => { CheckFile(); });
-            isChecking = false;
+            try
+            {
+                await Task.Run(() => CheckFile());
+            }
+            catch (Exception ex) 
+            {
+                SetLabelText(ex.ToString());
+            }
+            finally
+            {
+                isChecking = false;
+            }           
 
             //釋放記憶體
             GC.Collect();
             GC.WaitForPendingFinalizers();
         }
 
+
+
         /// <summary>
         /// 檢查資料夾是否新增檔案
         /// </summary>
         public void CheckFile() 
         {
+
+            message += $"執行檔案檢查中。\n";
+            SetLabelText(message);
+
             string filePath = "";
             if (AppConfig.FileSetting.LocalFilePathEnable) 
             {
@@ -192,15 +224,29 @@ namespace WinFormsAppBase
                 foreach (var file in files)
                 {
                     DateTime creationTime = File.GetCreationTime(file);
-                    if (creationTime >= fromTime)
+
+                    retry = 0;
+                    while (retry++ <= AppConfig.Setting.RetryMax)
                     {
-                        message += $"新增檔案：{file} （建立時間：{creationTime}）\n";                       
-                        SetLabelText(message);
-                        Mail(file);
+                        try
+                        {
+                            if (creationTime >= fromTime)
+                            {
+                                message += $"新增檔案：{file} （建立時間：{creationTime}）。\n";
+                                SetLabelText(message);
+                                Mail(file);
+                            }
+                            break;
+                        }
+                        catch (IOException)
+                        {
+                            message += $"執行第{retry}次，檔案正在被暫時性存取，檔案：{file} （建立時間：{creationTime}）。\n";
+                            SetLabelText(message);
+                            Thread.Sleep(AppConfig.Setting.StopSeconds); // 等5秒再試
+                        }
                     }
                 }
-            }         
-
+            } 
         }
 
         private void SetLabelText(string text)
