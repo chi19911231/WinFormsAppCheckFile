@@ -22,14 +22,9 @@
         /// <summary>
         /// 停止秒數
         /// </summary>
-        public int StopSeconds { get; set; }
+        public int StopSeconds { get; set; }     
 
-      
-
-        /// <summary>
-        /// 背景執行是否啟用
-        /// </summary>
-        public bool BackgroundExecutionEnable { get; set; }   
+   
 
         /// <summary>
         /// 視窗(高)
@@ -47,22 +42,11 @@
         /// 視窗是否隱藏到右下方
         /// </summary>
         public bool NotifyIconEnable { get; set; }
-
-      
-
-
-
         /// <summary>
-        /// 
+        /// 視窗關閉
         /// </summary>
-        public string ApiUrl { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public int RetryCount { get; set; }
-        /// <summary>
-        /// 
-        /// </summary>
-        public bool FeatureEnabled { get; set; }
+        public bool WindowCloseEnable { get; set; }
+
+
     }
 }

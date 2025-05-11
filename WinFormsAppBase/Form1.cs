@@ -100,17 +100,16 @@ namespace WinFormsAppBase
         {
             AppSettingsForm();
 
-            if (AppConfig.Setting.BackgroundExecutionEnable) 
+            if (AppConfig.Setting.WindowCloseEnable) 
             {
-                timer1.Interval = AppConfig.Setting.TimerDate;
-                timer1.Start();
-            }
-            else
-            {
-
                 CheckFile();
                 //Ãö³¬µ{¦¡
                 Application.Exit();
+            }
+            else
+            {
+                timer1.Interval = AppConfig.Setting.TimerDate;
+                timer1.Start();            
             }
          
         }
