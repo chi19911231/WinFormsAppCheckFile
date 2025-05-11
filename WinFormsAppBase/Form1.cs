@@ -3,6 +3,13 @@ using System.Net;
 using System.Runtime;
 using System.Windows.Forms;
 using WinFormsAppBase.Settings;
+using System.Data;
+using System.Data.SqlClient;
+using static System.Runtime.InteropServices.JavaScript.JSType;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
+using System.Collections.Generic;
+using System.Text;
+
 
 namespace WinFormsAppBase
 {
@@ -98,23 +105,24 @@ namespace WinFormsAppBase
 
         private void Form1_Load(object sender, EventArgs e)
         {
+
             AppSettingsForm();
 
-            if (AppConfig.Setting.WindowCloseEnable) 
-            {
-                CheckFile();
-                //關閉程式
-                Application.Exit();
-            }
-            else
-            {
-                timer1.Interval = AppConfig.Setting.TimerDate;
-                timer1.Start();            
-            }
-         
+            //if (AppConfig.Setting.WindowCloseEnable)
+            //{
+            //    CheckFile();
+            //    //關閉程式
+            //    Application.Exit();
+            //}
+            //else
+            //{
+            //    timer1.Interval = AppConfig.Setting.TimerDate;
+            //    timer1.Start();
+            //}
+
         }
 
-        public void Mail(string file) 
+        public void Mail(string file)
         {
             // 建立 SmtpClient 物件
             SmtpClient smtp = new SmtpClient(AppConfig.MailSetting.MailHost, AppConfig.MailSetting.MailPort);
@@ -123,7 +131,7 @@ namespace WinFormsAppBase
 
             // 建立 MailMessage 物件
             MailMessage mail = new MailMessage();
-            mail.From = new MailAddress(AppConfig.MailSetting.SendMail?? ""); // 寄件人
+            mail.From = new MailAddress(AppConfig.MailSetting.SendMail ?? ""); // 寄件人
 
             //收件人
             string[] receiveMailList = AppConfig.MailSetting.ReceiveMailList.Split(';');
@@ -131,7 +139,7 @@ namespace WinFormsAppBase
             {
                 if (!string.IsNullOrEmpty(receiveMail))
                 {
-                   mail.To.Add(receiveMail);
+                    mail.To.Add(receiveMail);
                 }
             }
 
@@ -158,7 +166,7 @@ namespace WinFormsAppBase
                 SetLabelText(message);
             }
             catch (Exception ex)
-            {              
+            {
                 SetLabelText($"例外原因:{ex.Message}");
             }
 
@@ -178,14 +186,14 @@ namespace WinFormsAppBase
             {
                 await Task.Run(() => CheckFile());
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 SetLabelText(ex.ToString());
             }
             finally
             {
                 isChecking = false;
-            }           
+            }
 
             //釋放記憶體
             GC.Collect();
@@ -197,26 +205,26 @@ namespace WinFormsAppBase
         /// <summary>
         /// 檢查資料夾是否新增檔案
         /// </summary>
-        public void CheckFile() 
+        public void CheckFile()
         {
 
             message += $"執行檔案檢查中。\n";
             SetLabelText(message);
 
             string filePath = "";
-            if (AppConfig.FileSetting.LocalFilePathEnable) 
+            if (AppConfig.FileSetting.LocalFilePathEnable)
             {
                 filePath = $@"{AppConfig.FileSetting.LocalFilePath}";
             }
-                
-            if (AppConfig.FileSetting.NetworkDriveFilePathEnable) 
+
+            if (AppConfig.FileSetting.NetworkDriveFilePathEnable)
             {
                 filePath = $@"{AppConfig.FileSetting.NetworkDriveFilePath}";
             }
 
-            bool existFile =  Directory.Exists(filePath);
-            if (existFile) 
-            {             
+            bool existFile = Directory.Exists(filePath);
+            if (existFile)
+            {
                 string[] files = Directory.GetFiles(filePath);
                 DateTime fromTime = DateTime.Now.AddSeconds(-(AppConfig.FileSetting.FrequencySeconds));
 
@@ -245,7 +253,7 @@ namespace WinFormsAppBase
                         }
                     }
                 }
-            } 
+            }
         }
 
         private void SetLabelText(string text)
@@ -262,5 +270,90 @@ namespace WinFormsAppBase
         }
 
 
+        private void LoadData()
+        {
+            //string mdfPath = @"D:\DBTEST\AppCheckFile.mdf";
+
+            string mdfPath = @"D:\Program Files\Microsoft SQL Server\MSSQL16.MSSQLSERVER\MSSQL\DATA\AppCheckFile.mdf";
+            //string connectionString = $@"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename={mdfPath};Integrated Security=True;Connect Timeout=30";
+            string connStr = @"Data Source=localhost;Initial Catalog=AppCheckFile;Integrated Security=True;";
+
+
+
+
+            //using (SqlConnection conn = new SqlConnection(connStr))
+            //{
+
+
+            //    conn.Open();
+            //    //string sql = "INSERT INTO[dbo].[UserInformation] ([SNo], [UserName], [Mail])VALUES(1, 2, 3)";
+
+
+
+            //   string sql = textBox1.Text;
+
+            //    using (SqlCommand cmd = new SqlCommand(sql, conn))
+            //    {
+            //        int rowsAffected = cmd.ExecuteNonQuery();
+            //        MessageBox.Show($"成功寫入 {rowsAffected} 筆資料！");
+            //    }
+
+            //    conn.Close();
+            //}
+
+            using (SqlConnection conn = new SqlConnection(connStr))
+            {
+                try
+                {
+                    //conn.Open();
+                    //string query = "SELECT * FROM UserInformation";
+                    //SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    //DataTable dt = new DataTable();
+                    //adapter.Fill(dt);
+
+
+                    conn.Open();
+                    //string query = "SELECT * FROM UserInformation";
+                    string query = textBox1.Text;
+                    SqlDataAdapter adapter = new SqlDataAdapter(query, conn);
+                    DataTable dt = new DataTable();
+                    adapter.Fill(dt);
+                    conn.Close();
+
+                    // 組合字串
+                    StringBuilder sb = new StringBuilder();
+
+                    foreach (DataRow row in dt.Rows)
+                    {
+                        foreach (var item in row.ItemArray)
+                        {
+                            sb.Append(item.ToString() + " ");
+                        }
+                        sb.AppendLine(); // 換行
+                    }
+
+                    textBox2.Multiline = true;
+                    textBox2.ScrollBars = ScrollBars.Vertical;
+                    textBox2.Text = sb.ToString();
+
+
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("錯誤: " + ex.Message);
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            LoadData();
+
+        }
+
+        private void textBox1_TextChanged(object sender, EventArgs e)
+        {
+
+        }
     }
 }
